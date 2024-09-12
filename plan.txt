@@ -1,0 +1,50 @@
+
+# BE READY FOR DEPLOYING
+
+
+
+
+add function that reviews IDs of tasks after deleting and connect it to delete function # actually only delete function should handle with it 
+    check function, make fake ids and comment main and execute the function
+make printing of results more beaturiful and clear
+add features to hangle errors for all functions and all situations
+decide what you do with location data.json
+optimize the code
+write tests for the project
+test your project completely
+delete excess comments
+structure and rewrite the code in order to make it compatable with PEP8 format
+write useful comments
+write README file
+finaly check the project
+    test your project completely
+publish the project on github
+send it to check
+
+
+
+# OPTIONAL
+
+
+
+add function to add time as seconds from 0 AD just for fun
+
+
+
+# log
+
+
+
+think about a decision to check if check_if_json_exist need to be added within functions and not be in main (analyze +-)
+    + it will make code and main function more clear
+    + it will make functions more atomize
+    - it will add more space for mistakes 
+force list function to access status regardless capital or non-capital letters
+    i should check only the commands: add, update, list, mark, delete. there is no any other things that should be checked, user can use any capitalization of letters in status
+    -> and description
+add function for change status
+add function list with different arguments
+add function delete
+    fix delete function
+added function update
+added function add
