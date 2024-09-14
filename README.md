@@ -14,7 +14,7 @@ A simple terminal task tracker in python.
 
 1. Clone the repository:
     ```bash
-    TODO
+    git clone https://github.com/eqsdxr/cli-task-tracker.git
     ```
 2. Navigate to the project directory:
     ```bash
