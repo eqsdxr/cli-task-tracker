@@ -1,188 +1,171 @@
-import argparse, json, datetime, os
+import argparse
+import json
+import datetime
 
 
-# geting and parsing terminal commands
+# Get and parse terminal commands
 parser = argparse.ArgumentParser()
 
-parser.add_argument('a1')
-parser.add_argument('a2', nargs='?')
-parser.add_argument('a3', nargs='?')
+parser.add_argument('command')
+parser.add_argument('task_id_or_mode_or_description', nargs='?', default=None)
+parser.add_argument('description', nargs='?', default=None)
 
 args = parser.parse_args()
 
-# content = {}
 
-# print(args.a1)
-# print(args.a2)
-# print(args.a3)
-
-
-# CHEATSHEATS
-
-# task_cli add|delete "buy groceries"
-# task_cli update 1 "study instead"
-# task_cli mark-done|mark-todo|mark-in-progress|mark-not-in-progress
-# task_cli list
-# task_cli list done|todo|in-progress
-
-# & C:/Users/Студент/AppData/Local/Programs/Python/Python312/python.exe "c:/Users/Студент/Desktop/Ivan Smagin/task tracker/main.py" update 1 "Hi!"
-
-#JSON
-# {
-#     "1": {"description": ????, "status": ????, "modification_data": ????}
-# }
-
-
-# DATE FUNCTION
-
+# Current date function
 def current_time()->str:
-    return (datetime.datetime.now().strftime("%Y-%m-%d--%H-%M"))
+    return datetime.datetime.now().strftime("%Y-%m-%d--%H-%M")
 
 
-# FUNCTIONS THAT CHECK FILES' EXISTENCE
-
-def check_if_json_exist()->bool:
+# Check if the JSON file exists
+def check_if_json_exists()->bool:
     try:
-        if os.path.getsize("data.json") > 0:
-            return "OK"
-        else:
-            raise Exception
-    except:
+        with open('data.json', 'r') as file:
+            json.load(file)
+        return True
+    except (FileNotFoundError, json.JSONDecodeError):
         with open("data.json", "w") as file:
-            pass
+            json.dump({}, file)
         return False
 
-# FUNCTIONS THAT REARRANGE TASKS' IDs
 
-def rearrange_task_ids():
-    with open('data.json', 'r') as file:
-        tasks_from_json = json.load(file)
-    task_keys = tasks_from_json.keys()
-    index = 0
-    for key in task_keys:
-        tasks_from_json[index] = tasks_from_json[key]
-        index += 1
+# Rearrange task IDs
+def rearrange_task_ids(tasks: dict)->None:
+    rearranged_tasks = {index: tasks[key] for index, key in enumerate(tasks)}
     with open('data.json', 'w') as file:
-        json.dump(tasks_from_json)
+        json.dump(rearranged_tasks, file, indent=4)
 
-# FUNCTIONS FOR ADDING TASK
 
-def task_add(description, status=None):
-    # this function doesn't need to check if a task exist
-    with open("data.json", "r") as file:
-        tasks_from_json = json.load(file)
+# Add a task
+def add_task(description: str, status: str, tasks: dict) -> str:
+    created_time = current_time()
+    task_id = len(tasks)
+    tasks[task_id] = {
+        "description": description,
+        "status": status if status else 'todo',
+        "last modified": created_time
+        }
     with open("data.json", "w") as file:
-        if status == None:
-            status = 'todo'
-        tasks_from_json[len(tasks_from_json)] = {"description": description, "status": status, "last modified": current_time()}
-        json.dump(tasks_from_json, file, indent=4)
-    print("successfully added")
-
-def task_add_when_no_tasks(description, status="todo"):
-    with open("data.json", "w") as file:
-        last_modified = current_time() # this function should exist because there are two outputs of date and they should be identical
-        to_add = {"0": {"description": description, "status": status, "last modified": last_modified}}
-        json.dump(to_add, file, indent=4)   
-    print(f"json file didn't exist so one was created and there is only one your task: \nid: 0\ndescription: {description}\nstatus: {status}\nlast modified: {last_modified}")
-        
+        json.dump(tasks, file, indent=4)
+    return f"Successfully added:\nid: {task_id}\ndescription: \"{description}\"\nstatus: {status if status else 'todo'}\ncreated: {created_time}"
 
 
-# CHECK IF A TASK EXIST
-
-def check_if_a_task_exist(task_id):
-    with open("data.json", "r") as file:
-        tasks_from_json = json.load(file)
-        if tasks_from_json[task_id]:
-            return "OK"
-        else:
-            return False
+# Check if a task exists
+def check_if_task_exists(task_id: str, tasks: dict) -> bool:
+    return task_id in tasks
 
 
-# UPDATE FUNCTIONS
-
-def json_update(a2, a3):
-    if check_if_a_task_exist(a2) == "OK":
-        with open("data.json", "r") as file:
-            tasks_from_json = json.load(file)
-            tasks_from_json[a2]["description"] = a3
-            tasks_from_json[a2]["last modified"] = current_time()
+# Update a task
+def update_task(task_id: str, description: str, tasks: dict) -> str:
+    if check_if_task_exists(task_id, tasks):
+        old_description = tasks[task_id]["description"]
+        tasks[task_id]["description"] = description
+        tasks[task_id]["last modified"] = current_time()
         with open("data.json", "w") as file:
-            json.dump(tasks_from_json, file, indent=4)
-        return "success"
+            json.dump(tasks, file, indent=4)
+        if old_description == description:
+            return f"Task with id {task_id} already has this description.\n{old_description} => X"
+        return f"Task {task_id} updated.\n{old_description} => {description}"
     else:
-        return "task id doesn't exist"
+        return f"Task {task_id} not found."
 
 
-# DELETE FUNCTION # WORKS PROPERLY
-
-def json_task_delete(task_id):
-    if check_if_a_task_exist(task_id) == "OK":
-        with open("data.json", "r") as file:
-            tasks_from_json = json.load(file)
-            status = tasks_from_json[task_id]['status']
-            description = tasks_from_json[task_id]['description']
-            last_modified = tasks_from_json[task_id]['last modified']
-        with open("data.json", "w") as file:
-            json.dump(tasks_from_json, file, indent=4)
-            return f"a task was deleted \nid: \"{task_id}\"\ndescription: \"{description}\"\nstatus:{status}\nlast modification time:{last_modified}"
-        rearrange_task_ids()
+# Delete a task
+def delete_task(task_id: str, tasks: dict) -> str:
+    if '.' in task_id:
+        task_ids = task_id.split('.')
+        result = []
+        for task_id in task_ids:
+            if check_if_task_exists(task_id, tasks):
+                deleted_task = {
+                    'description': tasks[task_id]['description'],
+                    'status': tasks[task_id]['status'],
+                    'last modified': tasks[task_id]['last modified']
+                }
+                del tasks[task_id]
+                result.append(f"{task_id} ; {deleted_task['description']} ; {deleted_task['status']} ; {deleted_task['last modified']}")
+            else:
+                result.append(f"Task with id \"{task_id}\" not found.")
+        rearrange_task_ids(tasks)
+        result.insert(0, 'Deleted tasks:')
+        result.append('*task IDs were rearranged')
+        return [result, "list"]
     else:
-        return f"the task with id \"{task_id}\" doesn't exist"
-
-
-# LIST FUNCTIONS
-
-def task_list(mode=None):
-    if mode == None or (mode).lower() == 'none':
-        with open('data.json', 'r') as file:
-            task_list = json.load(file)
-        return task_list
-    else:
-        with open('data.json', 'r') as file:
-            former_task_list = json.load(file)
-            new_task_list = {}
-            for i in former_task_list:
-                if former_task_list[i]['status'] == mode:
-                    new_task_list[i] = former_task_list[i]
-        if len(new_task_list) >= 1:
-            return new_task_list
+        if check_if_task_exists(task_id, tasks):
+            deleted_task = {
+                'description': tasks[task_id]['description'],
+                'status': tasks[task_id]['status'],
+                'last modified': tasks[task_id]['last modified']
+            }
+            del tasks[task_id]
+            rearrange_task_ids(tasks)
+            return f"A task was deleted.\nid: {task_id}\ndescription: {deleted_task['description']}\nstatus: {deleted_task['status']}\nlast modified: {deleted_task['last modified']}\n*task IDs were rearranged"
         else:
-            return "There's no any task with this status"
+            return f"Task with id \"{task_id}\" not found."
 
-    
-# MARK FUNCTION # ADD ID PRINT FUNCTION AND CORECT THE PRINTING
 
-def mark_function(task_id, new_status):
-    if check_if_a_task_exist(task_id) == "OK":
+# List tasks
+def list_tasks(status: str, tasks: dict) -> dict:
+    if not tasks:
+        return "No tasks available."
+    if status:
+        filtered_tasks = {key: task for key, task in tasks.items() if task['status'] == status}
+        if filtered_tasks:
+            return filtered_tasks
+        return f'There\'s no tasks with the status "{status}"'
+    return tasks
+
+
+# Mark task as done/in-progress/todo/neglected/etc.
+def mark_task(task_id: str, status: str, tasks: dict) -> list:
+    if check_if_task_exists(task_id, tasks):
+        old_status = tasks[task_id]["status"]
+        old_last_modified = tasks[task_id]["last modified"]
+        tasks[task_id]["status"] = status
+        tasks[task_id]["last modified"] = current_time()
+        with open("data.json", "w") as file:
+            json.dump(tasks, file, indent=4)
+        return f'id: {task_id}\nstatus: "{old_status}" => "{status}"\n"{tasks[task_id]["description"]}"\nlast modified: {old_last_modified} => {tasks[task_id]["last modified"]}'
+    return f"Task {task_id} not found."
+
+
+# Main function
+def main(command, task_id_or_mode_or_description=None, description=None, status=None):
+    if check_if_json_exists():
         with open('data.json', 'r') as file:
-            task_list = json.load(file)
-        task_list[task_id]['status'] = new_status
-        task_list[task_id]['last modified'] = current_time()
-        with open('data.json', 'w') as file:
-            json.dump(task_list, file, indent=4)            
-        return task_list[task_id]
+            tasks = json.load(file)
+
+        if command.lower() == "add":
+            print(add_task(task_id_or_mode_or_description, str(description), tasks))
+
+        elif command.lower() == "update":
+            if task_id_or_mode_or_description is None or description is None:
+                print("Task ID and description are required for updating.")
+                return
+            print(update_task(task_id_or_mode_or_description, str(description), tasks))
+
+        elif command.lower() == "delete":
+            result = delete_task(task_id_or_mode_or_description, tasks)
+            if result[1] == "list":
+                for i in result[0]:
+                    print(i)
+            else:
+                print(result)
+        elif command.lower() == "list":
+            tasks_to_list = list_tasks(task_id_or_mode_or_description, tasks)
+            if isinstance(tasks_to_list, str):
+                print(tasks_to_list)
+            else:
+                for key, task in tasks_to_list.items():
+                    print(f"{key}; {task['status']}; {task['last modified']}; {task['description']}")
+
+        elif command.lower() == 'mark':
+            print(mark_task(task_id_or_mode_or_description, description, tasks))
+        else:
+            print('the command was unrecognized')
     else:
-        return "task with this id doesn't exist"
-    
-    
-# MAIN FUNCTION
-
-def main(a1, a2=None, a3=None):
-    if check_if_json_exist() == "OK":
-        if a1.lower() == "add":  # make output beautiful
-            task_add(a2, a3)
-        elif a1.lower() == "update":  # make output beautiful
-            print(json_update(a2, a3))
-        elif a1.lower() == "delete":  # make output beautiful
-            print(json_task_delete(a2))
-        elif a1.lower() == "list":  # make output beautiful
-            print(task_list(a2))
-        elif a1.lower() == 'mark':  # make output beautiful
-            print(mark_function(a2, a3))
-    elif a1.lower() == "add":  # make output beautiful
-        task_add_when_no_tasks(a2, a3)
-    else:
-        print("json file doesn't exist, so no tasks can be deleted/updated/marked/printed. \n now json file does exist and you can add new tasks there")
+        print("JSON file didn't exist. Now it exist and you can add new tasks.")
 
 
-main(args.a1, args.a2, args.a3)
+main(args.command, args.task_id_or_mode_or_description, args.description)
