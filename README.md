@@ -1,6 +1,6 @@
 # cli-task-tracker
 
-A simple terminal task tracker in python.
+A simple terminal task tracker in python. Project from https://roadmap.sh/projects/task-tracker.
 
 ## Features
 
