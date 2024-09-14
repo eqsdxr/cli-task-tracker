@@ -1,4 +1,4 @@
-# Terminal-task-tracker-in-python
+# cli-task-tracker
 
 A simple terminal task tracker in python.
 
