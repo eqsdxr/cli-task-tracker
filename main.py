@@ -43,7 +43,8 @@ def add_task(description: str, status: str, tasks: dict) -> str:
     try:
         task_id = int(next(reversed(tasks)))+1
     except:
-        return "an error with task IDs"
+        if not tasks:
+            task_id = 0
     status = (None if status.lower() == "none" else status) if status else 'todo' # if a person want to add None as a status they can do it
     tasks[task_id] = {
         "description": description,
