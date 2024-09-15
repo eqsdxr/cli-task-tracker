@@ -38,7 +38,8 @@ Run the script from the command line with the appropriate command and arguments:
     ```
 - **delete**:
     ```bash
-    python task_tracker.py delete task_id | id1.id2.id3
+    python task_tracker.py delete task_id
+    python task_tracker.py delete id1.id2.id3
     ```
     - task IDs remain unchanged.
     - You can delete multiple tasks by specifying a range or list of `task_ids`, separated by dots (e.g., `0.1.2.3.4`). The order of indexes doesn't matter.
