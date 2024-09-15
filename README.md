@@ -6,7 +6,7 @@ A simple terminal task tracker in python. A project from https://roadmap.sh/proj
 
 - **add**: add a new task.
 - **update**: update description of the task with specific id.
-- **delete**: rremove task/tasks with specific ID/IDs.
+- **delete**: remove task/tasks with specific ID/IDs.
 - **list**: show all tasks with specific status.
 - **mark**: change the status of task with specific id.
 - **rearrange**: rearrange task IDs and print them.
