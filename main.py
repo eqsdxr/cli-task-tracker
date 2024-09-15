@@ -79,7 +79,7 @@ def update_task(task_id: str, description: str, tasks: dict) -> str:
             return f"Task with id {task_id} already has this description.\ndescription: {old_description} => {old_description}"
         return f"Successfully updated:\nid: {task_id}\ndescription: \"{old_description}\" => \"{description}\"\nstatus: {tasks[task_id]['status']}\ncreated: {tasks[task_id]['created']}\nlast modified: {old_last_modified} => {tasks[task_id]['last modified']}"
     else:
-        return f"Task {task_id} not found."
+        return f"Task with id {task_id} not found."
 
 
 # Delete a task
@@ -160,7 +160,7 @@ def mark_task(task_id: str, status: str, tasks: dict) -> list:
         with open("data.json", "w") as file:
             json.dump(tasks, file, indent=4)
         return f'id: {task_id}\nstatus: "{old_status}" => "{status}"\n"{tasks[task_id]["description"]}"\nlast modified: {old_last_modified} => {tasks[task_id]["last modified"]}\ncreated: {tasks[task_id]["created"]}'
-    return f"Task {task_id} not found."
+    return f"Task with id {task_id} not found."
 
 
 # Main function
