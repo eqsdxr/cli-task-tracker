@@ -88,6 +88,8 @@ Run the script from the command line with the appropriate command and arguments:
     ```bash
     python task_tracker.py mark 0 completed
     ```
+## Notes
+- json file will be created if it doesn't exist.
 
 ## License
 
