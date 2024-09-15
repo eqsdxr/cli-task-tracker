@@ -4,11 +4,12 @@ A simple terminal task tracker in python. A project from https://roadmap.sh/proj
 
 ## Features
 
-- **add**: add a new task
-- **update**: update description of the task with specific id
-- **delete**: remove task with specific id
-- **list**: show all tasks with specific status
-- **mark**: change the status of task with specific id 
+- **add**: add a new task.
+- **update**: update description of the task with specific id.
+- **delete**: rremove task/tasks with specific ID/IDs.
+- **list**: show all tasks with specific status.
+- **mark**: change the status of task with specific id.
+- **rearrange**: rearranges task IDs and prints them.
 
 ## Installation
 
@@ -30,6 +31,7 @@ Run the script from the command line with the appropriate command and arguments:
     ```bash
     python task_tracker.py add "Task Description" "optional_status"
     ```
+    - default status: todo
 - **update**:
     ```bash
     python task_tracker.py update task_id "New Description"
@@ -38,16 +40,24 @@ Run the script from the command line with the appropriate command and arguments:
     ```bash
     python task_tracker.py delete task_id | id1.id2.id3
     ```
-    - You can delete multiple tasks by specifying a list of `task_ids`, separated by dots (e.g., `0.1.2.3.4`).
+    - task IDs remain unchanged.
+    - You can delete multiple tasks by specifying a range or list of `task_ids`, separated by dots (e.g., `0.1.2.3.4`). The order of indexes doesn't matter.
 - **list**:
     ```bash
     python task_tracker.py list [status]
     ```
     - If `status` is omitted, all tasks will be listed.
 - **mark**:
+    - default status: None
     ```bash
     python task_tracker.py mark task_id new_status
     ```
+- **rearrange**:
+    ```bash
+    python task_tracker.py rearrange
+    ```
+- **WARNING**:
+    - If you modify the JSON file yourself, make sure you do it correctly and keep a backup, any syntax mistakes could cause the JSON to be overwritten.
 
 ## Example
 
